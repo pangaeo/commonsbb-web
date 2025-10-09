@@ -56,6 +56,16 @@
 		overflow: hidden;
 		margin: 0em auto;
 		width: 1200px;
+		max-width: 100%;
+		padding: 0 20px;
+	}
+	
+	/* Mobile responsive container */
+	@media (max-width: 1240px) {
+		.container {
+			width: 100%;
+			padding: 0 20px;
+		}
 	}
 	
 /*********************************************************************************/
@@ -235,6 +245,18 @@
 	.boxC
 	{
 		float: right;
+	}
+	
+	/* Mobile responsive three-column layout */
+	@media (max-width: 1240px) {
+		.boxA,
+		.boxB,
+		.boxC {
+			width: 100%;
+			float: none;
+			margin-right: 0;
+			margin-bottom: 2em;
+		}
 	}
 
 /*********************************************************************************/
@@ -532,8 +554,17 @@
 	#welcome .container
 	{
 		width: 1000px;
+		max-width: 100%;
 		padding: 0px 100px;
 		color: rgba(255,255,255,0.8);
+	}
+	
+	/* Mobile responsive welcome container */
+	@media (max-width: 1240px) {
+		#welcome .container {
+			width: 100%;
+			padding: 0px 20px;
+		}
 	}
 	
 	#welcome a
