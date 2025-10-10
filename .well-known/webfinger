@@ -1,0 +1,15 @@
+{
+  "subject": "acct:john@pangaeo.com",
+  "links": [
+    {
+      "rel": "http://webfinger.net/rel/profile-page",
+      "type": "text/html",
+      "href": "https://social.isurf.ca/profile/ubernatural/profile"
+    },
+    {
+      "rel": "self",
+      "type": "application/activity+json",
+      "href": "https://social.isurf.ca/profile/ubernatural/status"
+    }
+  ]
+}
