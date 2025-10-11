@@ -2012,7 +2012,7 @@ ul.icons {
     display: block;
     height: 100%;
     left: 0;
-    opacity: 0.45;
+    opacity: 0.30;
     position: absolute;
     top: 0;
     width: 100%;
@@ -2200,6 +2200,8 @@ ul.icons {
   #cta .highlights .content {
     background: #41ab5d;
     box-shadow: 0px 0px 4px 1px rgba(255, 255, 255, 0.025); }
+  #cta p.icon {
+    color: #ffffff; }
   #cta .testimonials .content {
     background: #41ab5d;
     box-shadow: 0px 0px 4px 1px rgba(255, 255, 255, 0.025); }
@@ -2396,7 +2398,7 @@ ul.icons {
       padding: 2rem 0 0.1rem 0 ; } }
 
 .responsive-img {
-    max-width: 50%;
+    max-width: 75%;
     height: auto;
     display: block;
     margin-left: auto;
