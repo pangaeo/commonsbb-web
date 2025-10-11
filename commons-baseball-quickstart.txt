@@ -1,0 +1,138 @@
+Step 1: Build your roster (your "deck").
+
+Build a roster of 60 players. You need 50 batters and 10 pitchers.
+You may have a maximum of 4 relievers, with the rest being starting pitchers. A reliever is defined as a pitcher with an average of 3 or fewer innings per game during the season.
+Set whatever order you would like for the batters and pitchers.
+
+Step 2: Take your baseball gods - 3 hits, 3 outs, 3 advances, and 2 challenges. 
+
+Step 3: Decide who is home team, and who is visiting team.
+
+I suggest rock-paper-scissors.
+
+Step 4: Play ball!
+
+Each game is divided into a minimum of 9 innings, with more innings being played to break a tie. Each inning is divided into a top half and a bottom half. If the home team is leading after the top of the 9th, the bottom of the 9th inning is not played and the game is over.
+
+During the top half of an inning, the home team pitches to as many batters as needed in order to get three of them out. During the bottom half, the visiting team does the same - pitching to as many batters as needed in order to get three out.
+
+At the beginning of each inning, both teams select the next pitcher from their list - each pitcher may only throw one inning. A team may choose to discard a pitcher and use the next one in the list instead, but this means they have one fewer pitcher available in their roster which will be consequential if the game goes to extra innings (see the section on extra innings, below).
+
+Each time a pitcher throws to a batter, it is considered a turn. Each turn consists of two phases, a pitching phase followed by a batting phase. 
+
+Here is the sequence of one turn:
+
+P: Play a defensive baseball gods card? - out, 2 out
+B: Challenge that baseball gods card? - only possible with out, not possible with the supergod card
+** If baseball card played and not challenged, end turn, adding either one out or 2 out depending on the card played
+P: Roll to pitch, or intentional walk
+** If pitch roll results in automatic hit, automatic out, or automatic walk, end of turn
+B: Steal?
+** If there are currently 2 out and the runner is out, end turn and end inning but keep batter in lineup for next inning
+B: Pinch hit?
+** Possible only for batters who played for multiple teams in the season the card is for
+** Pinch hit requires the active batter to be discarded, and any batter remaining in the roster to take that batter's place
+B: Play an offensive baseball gods card? - hit, double
+P: Video replay that baseball gods card? - only possible with hit, not possible with the supergod card
+B: Decide to swing for the fences?
+B: Roll to swing, or bunt
+** If bunt, advance runners one base, add one out, end turn
+B: Advance?
+** Only possible if runners were on base, advance cannot be used for the batter (e.g. bases empty, batter hits double, cannot use advance to advance them to third)
+** One advance per runner, a single advance card does not apply to all baserunners
+** Multiple advance cards may be played in a single turn, for when multiple runners are on base
+
+
+* Optional: the pitching team may play an "out" baseball gods card or a "2 out" super card
+* If an "out" card was played, the batting team may either:
+** Play a "challenge" manager card to cancel the "out"
+** Accept the out, and end the turn
+* If a "2 out" super card was played, both the batter and the next batter in the inning are out, and the turn ends. If there are already 2 out when the "2 out" super card is played, only the current batter is out - the extra out does not carry over into the next inning.
+
+* The pitch is delivered with a dice roll. There are four possible outcomes of the pitch:
+** The batter is automatically out (the dice roll is higher than the stated "OUT" threshold on the pitcher card).
+** The batter gets a single (the dice roll is higher than the stated "HIT" threshold on the pitcher card).
+** The batter walks (the dice roll is lower than the stated "BB" threshold on the pitcher card).
+** The pitch is delivered.
+
+* Optional: If there is a runner on first and the base ahead is open, the batting team may have the baserunner steal. A steal is played with a dice roll, with the thresholds for stealing shown on the back of the player card who is stealing.
+Once the pitch is delivered, the offensive team (batting) is in control. The bat is swung with a dice roll. There are five possible outcomes of the swing:
+* The batter gets a single (the dice roll is equal to or higher than the stated "1B" threshold but lower than the stated "2B" threshold on the batter card).
+* The batter gets a double (the dice roll is equal to or higher than the stated "2B" threshold but lower than the stated "3B" threshold on the batter card).
+* The batter gets a triple (the dice roll is equal to or higher than the stated "3B" threshold but lower than the stated "HR" threshold on the batter card).
+* The batter gets a home run (the dice roll is equal to or higher than the stated "HR" threshold on the batter card).
+* The batter is out.
+
+Concept: Card Season
+
+We usually refer to baseball cards using a year and card brand, e.g. 1983 Topps. In most cases, the card represents that player's season for the *previous* year. In the case of 1983 Topps, the cards show pictures and statistics of players during the 1982 season. Even though many cards include statistics for all seasons in a player's career o that point as well as career totals, Commons Baseball uses the statistics for the 'card season'
+
+Concept: Dice roll.
+
+Dice are rolled to determine what happens to pitchers, batters, and runners in Commons Baseball. Each player card has a series of thresholds printed on the back. These thresholds can be thought of as 4-digit numbers, reading them left to right (or top to bottom). The single die is rolled only as many times as needed to determine if the threshold has been met. There are a maximum of 4 dice rolls required for each play.
+
+It's not normally any slower to play with just one die than with 4 dice (each one representing one of the four place values) - this is due to the time it would take to arrange 4 coloured dice in the correct order after the roll to find out what happened, and since the majority of events will only take one die to determine. One die is also more fun because of the added suspense when 4 rolls are needed.
+
+Before being used in Commons Baseball, a card needs to have its card season statistics converted into dice roll probabilities. This can be done using the Commons Baseball app, or by using the Commons Baseball Excel workbook downloaded from commonsbaseball.com. Each method gives you an option to print out dice roll probability sheets for each of the players on your roster, which are then cut out and inserted inside penny sleeves along with the card itself. The app provides an additional option to generate a document with probabilities that you can print onto Avery 5160 (address) labels, so you can stick them directly onto the outside of the penny sheet instead of cutting and inserting paper sheets.
+
+Concept: Pitcher cards.
+
+An arbitrary decision has been made in Commons Baseball to treat an ERA of 4.00 to be neutral (in the Lahman baseball database, the median ERA for all pitchers in history is 4.17). Pitchers with an ERA of under 4.00 will have "OUT" thresholds on the back of their cards. Those with an ERA above 4.00 will have "HIT" thresholds on the back.
+
+There are different thresholds when pitching to left-handed batters vs. right-handed batters. This is to account for the *general* real-life difference when right-handed batters face right-handed pitchers (and left vs. left). In a small number of cases, a pitcher may have an "OUT" threshold for left-handed batters and a "HIT" threshold for right-handed batters (if they straddle 4.00 ERA).
+
+Concept: Baseball Gods
+
+Each player is assigned multiple baseball gods cards at the beginning of the game, to use at will. These include 3 hits, 3 outs, 3 advances, and 2 challenges.
+
+Playing a 'hit' card as a batter automatically gives the batter a single, without having to roll. The pitch still must be delivered.
+
+Playing an 'out' card as a pitcher automatically gets the batter out, without the pitcher needing to deliver a pitch.
+
+A 'challenge' card may be played immediately after a 'hit' or 'out' card is played. If a challenge is played, the 'hit' or 'out' card is discarded and the play proceeds as normal with dice rolls. If a 'hit' is challenged, another offensive baseball god may not be played. If an 'out' is challenged, the pitcher must deliver the pitch with dice rolls, another defensive baseball god may not be played.
+
+An 'advance' card may be used to advance one baserunner one base on a hit from a batter. Under regular circumstances the runners only advance as far as needed to vacate the base the runner behind is occupying. For example, if there is a runner on first and the batter hits a double, the runner on first automatically advances to third. An 'advance' card may be played to advance the baserunner from third to home. An advance card may not be challenged. Only one advance card may be used for a single baserunner on a single play. For example, if there is a runner on first and the batter hits a single, you cannot play two advance cards to advance the runner from second to home. However, if there are two runners on base, you can use two advance cards to advance them both. For example, if there are runners on first and second and the batter hits a single, you can use one advance card to advance the runner from third to home, and another advance card to advance the other runner from second to third.
+
+Concept: Super Gods
+
+There are two special baseball gods cards called 'super gods' in Commons Baseball. One grants a hitter an automatic double, the other grants a team an automatic 2 outs. Super gods may not be challenged.
+
+The super gods are not assigned to any team at the beginning of the game. They are always available to take whenever they are needed. As soon as one team uses a super gods card, the other player is granted the other to use at will.
+
+If the 2 outs super god is played when there are already 2 outs in an inning, the inning is over but the extra out does not carry over to the next inning.
+
+Concept: Salary Cap
+
+Each player in the Lahman database (i.e. every player in MLB history) is given a ranking from 1 to 10 for each year played, based on their statistics for that given year in comparison with all other players ever. Players who had terrible years will rank a 1, players with all-star calibre years will rank a 10. When building your roster of 60 players, you may have a total of 300 points across all of them, which is an average of 5 per player. If you choose a couple of 10-ranked players for your roster, you need to compensate by having some other lower-ranked players as well. The purpose of this is to give more cards a chance to be included in rosters, since playing with commons is the purpose of the game. It forces you to be creative with your roster building, instead of just pulling out 60 all-stars for your lineup.
+
+The ranking calculations are intentionally simplistic, and reflect only that narrow set of statistics shown on the back of player cards which are used by the game. For batters this is slugging percentage, with a small stolen bases impact considered. For pitchers it is ERA with a small base on balls impact considered.
+
+Concept: Pinch Hitting
+
+Any batter who played for multiple teams in the card season may be swapped out for any other batter remaining in the lineup during the game. Often these cards are identified by text on the front that says 'Now with Rangers' or something similar, but not always. Likewise, sometimes a card may say 'Now with...' but the player did not actually play any games for both teams (they could have been traded in the offseason, for example). The only rule for the card to be used as a pinch hit card is that both teams statistics must be shown on the card back for the card season.
+
+Concept: Legal Cards
+
+Any card meeting the following criteria may be legally used in a roster:
+- The statistics for the card season must be printed on the card
+- Pitcher statistics must include ERA, innings pitched, handedness (left or right), and walks.
+- Batter statistics must include average, doubles, triples, home runs, stolen bases, handedness (left, right, or both), and at bats.
+
+Special cards, such as commemorative cards, some all-star cards, checklists, etc. which show a player but do not include that player's statistics are not valid.
+
+A roster may not have more than one card of the same player, even if it is from different years.
+
+Concept: Running out of Players
+
+If a game goes more than 10 innings, or if a player chooses to skip multiple pitchers in their lineup, they may run out of pitchers in their roster before the game is finished. When this happens, the opposing player chooses a pitcher who has already thrown a complete inning (3 outs) from their discard pile to use as the pitcher for the other team for the rest of the game. This will typically be a very weak pitcher so it is a disadvantage to run out of pitchers. 
+
+If a team runs out of batters, the opposing team selects any batter who did not score from their own team to be used as the batter for the opposing team for the rest of the tame. Again, this will be a weak batter so it is best to not run out of batters (using a lot of pinch hitters will burn through your batting lineup so use them sparingly).
+
+Concept: Swinging for the Fences
+
+Any batter may choose to swing for the fences, a decision made just before rolling for a hit. When a batter swings for the fences, any hit which is a 2B or higher is automatically counted as a home run. The disadvantage is that any roll that would have been a single is an automatic out.
+
+Concept: Switch Hitters
+
+Any batter identified as hitting both left and right will automatically hit opposite to what the pitcher is throwing (i.e. hit left against right-handed pitchers and vice versa).
+

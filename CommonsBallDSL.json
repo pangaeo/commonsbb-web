@@ -1,0 +1,1263 @@
+{
+  "version": "1.0.0",
+  "game": "Commons Baseball",
+  "description": "Domain-specific language for Commons Baseball gameplay automation and history tracking",
+  
+  "gameState": {
+    "description": "Complete game state object that is maintained throughout gameplay",
+    "properties": {
+      "gameId": {
+        "type": "string",
+        "description": "Unique identifier for this game"
+      },
+      "timestamp": {
+        "type": "datetime",
+        "description": "Game start timestamp"
+      },
+      "teams": {
+        "home": {
+          "name": "string",
+          "roster": {
+            "batters": {
+              "type": "array",
+              "length": 50,
+              "items": "PlayerCard"
+            },
+            "pitchers": {
+              "type": "array",
+              "length": 10,
+              "items": "PitcherCard"
+            }
+          },
+          "batterIndex": {
+            "type": "integer",
+            "description": "Current position in batting order (0-49)"
+          },
+          "pitcherIndex": {
+            "type": "integer",
+            "description": "Current pitcher in rotation (0-9)"
+          },
+          "discardedBatters": {
+            "type": "array",
+            "description": "Batters removed via pinch hitting"
+          },
+          "discardedPitchers": {
+            "type": "array",
+            "description": "Pitchers who have completed innings or been skipped"
+          },
+          "baseballGods": {
+            "hit": {"type": "integer", "initial": 3, "max": 3},
+            "out": {"type": "integer", "initial": 3, "max": 3},
+            "advance": {"type": "integer", "initial": 3, "max": 3},
+            "challenge": {"type": "integer", "initial": 2, "max": 2}
+          },
+          "superGods": {
+            "double": {"type": "boolean", "initial": false},
+            "twoOut": {"type": "boolean", "initial": false}
+          }
+        },
+        "visiting": {
+          "name": "string",
+          "roster": {
+            "batters": {
+              "type": "array",
+              "length": 50,
+              "items": "PlayerCard"
+            },
+            "pitchers": {
+              "type": "array",
+              "length": 10,
+              "items": "PitcherCard"
+            }
+          },
+          "batterIndex": {
+            "type": "integer",
+            "description": "Current position in batting order (0-49)"
+          },
+          "pitcherIndex": {
+            "type": "integer",
+            "description": "Current pitcher in rotation (0-9)"
+          },
+          "discardedBatters": {
+            "type": "array",
+            "description": "Batters removed via pinch hitting"
+          },
+          "discardedPitchers": {
+            "type": "array",
+            "description": "Pitchers who have completed innings or been skipped"
+          },
+          "baseballGods": {
+            "hit": {"type": "integer", "initial": 3, "max": 3},
+            "out": {"type": "integer", "initial": 3, "max": 3},
+            "advance": {"type": "integer", "initial": 3, "max": 3},
+            "challenge": {"type": "integer", "initial": 2, "max": 2}
+          },
+          "superGods": {
+            "double": {"type": "boolean", "initial": false},
+            "twoOut": {"type": "boolean", "initial": false}
+          }
+        }
+      },
+      "currentInning": {
+        "type": "integer",
+        "initial": 1,
+        "description": "Current inning number"
+      },
+      "currentHalf": {
+        "type": "enum",
+        "values": ["top", "bottom"],
+        "initial": "top",
+        "description": "Current half of inning"
+      },
+      "outs": {
+        "type": "integer",
+        "initial": 0,
+        "min": 0,
+        "max": 3,
+        "description": "Current number of outs in the half-inning"
+      },
+      "bases": {
+        "first": {
+          "type": "object",
+          "nullable": true,
+          "description": "Player card on first base, or null if empty"
+        },
+        "second": {
+          "type": "object",
+          "nullable": true,
+          "description": "Player card on second base, or null if empty"
+        },
+        "third": {
+          "type": "object",
+          "nullable": true,
+          "description": "Player card on third base, or null if empty"
+        }
+      },
+      "score": {
+        "home": {"type": "integer", "initial": 0},
+        "visiting": {"type": "integer", "initial": 0}
+      },
+      "currentBatter": {
+        "type": "object",
+        "description": "Current batter card"
+      },
+      "currentPitcher": {
+        "type": "object",
+        "description": "Current pitcher card"
+      },
+      "battingTeam": {
+        "type": "enum",
+        "values": ["home", "visiting"]
+      },
+      "pitchingTeam": {
+        "type": "enum",
+        "values": ["home", "visiting"]
+      },
+      "turnState": {
+        "type": "object",
+        "description": "State specific to current turn",
+        "properties": {
+          "phase": {
+            "type": "enum",
+            "values": ["defensive_gods", "pitch", "steal", "pinch_hit", "offensive_gods", "swing", "advance", "complete"]
+          },
+          "swingingForFences": {"type": "boolean", "initial": false},
+          "pitchDelivered": {"type": "boolean", "initial": false},
+          "hitOccurred": {"type": "boolean", "initial": false},
+          "hitType": {
+            "type": "enum",
+            "nullable": true,
+            "values": ["single", "double", "triple", "homerun", "walk"]
+          }
+        }
+      },
+      "gameStatus": {
+        "type": "enum",
+        "values": ["not_started", "in_progress", "completed"],
+        "initial": "not_started"
+      },
+      "winner": {
+        "type": "enum",
+        "nullable": true,
+        "values": ["home", "visiting", null]
+      }
+    }
+  },
+
+  "dataTypes": {
+    "PlayerCard": {
+      "cardId": "string",
+      "playerName": "string",
+      "team": "string",
+      "cardYear": "integer",
+      "cardBrand": "string",
+      "cardSeason": "integer",
+      "handedness": {
+        "type": "enum",
+        "values": ["L", "R", "B"]
+      },
+      "thresholds": {
+        "vsLeft": {
+          "single": "integer",
+          "double": "integer",
+          "triple": "integer",
+          "homerun": "integer"
+        },
+        "vsRight": {
+          "single": "integer",
+          "double": "integer",
+          "triple": "integer",
+          "homerun": "integer"
+        }
+      },
+      "stealThreshold": "integer",
+      "ranking": {
+        "type": "integer",
+        "min": 1,
+        "max": 10
+      },
+      "multiTeam": "boolean",
+      "stats": {
+        "average": "float",
+        "doubles": "integer",
+        "triples": "integer",
+        "homeruns": "integer",
+        "stolenBases": "integer",
+        "atBats": "integer"
+      }
+    },
+    "PitcherCard": {
+      "cardId": "string",
+      "playerName": "string",
+      "team": "string",
+      "cardYear": "integer",
+      "cardBrand": "string",
+      "cardSeason": "integer",
+      "handedness": {
+        "type": "enum",
+        "values": ["L", "R"]
+      },
+      "isReliever": "boolean",
+      "thresholds": {
+        "vsLeft": {
+          "out": {"type": "integer", "nullable": true},
+          "hit": {"type": "integer", "nullable": true},
+          "walk": "integer"
+        },
+        "vsRight": {
+          "out": {"type": "integer", "nullable": true},
+          "hit": {"type": "integer", "nullable": true},
+          "walk": "integer"
+        }
+      },
+      "ranking": {
+        "type": "integer",
+        "min": 1,
+        "max": 10
+      },
+      "stats": {
+        "era": "float",
+        "inningsPitched": "float",
+        "walks": "integer"
+      }
+    },
+    "DiceRoll": {
+      "rollNumber": "integer",
+      "digit": {
+        "type": "integer",
+        "min": 1,
+        "max": 6
+      },
+      "cumulativeValue": "integer",
+      "timestamp": "datetime"
+    }
+  },
+
+  "turnSequence": {
+    "description": "Complete turn sequence with state changes",
+    "phases": [
+      {
+        "phaseId": 1,
+        "name": "defensive_baseball_gods",
+        "description": "Pitching team may play Out or 2Out card",
+        "actors": ["pitchingTeam"],
+        "actions": [
+          {
+            "actionType": "play_out_card",
+            "condition": "gameState.teams[pitchingTeam].baseballGods.out > 0",
+            "stateChanges": [
+              {
+                "property": "gameState.teams[pitchingTeam].baseballGods.out",
+                "operation": "decrement",
+                "value": 1
+              }
+            ],
+            "triggerPhase": 2
+          },
+          {
+            "actionType": "play_2out_super_card",
+            "condition": "gameState.teams[pitchingTeam].superGods.twoOut === true",
+            "stateChanges": [
+              {
+                "property": "gameState.teams[pitchingTeam].superGods.twoOut",
+                "operation": "set",
+                "value": false
+              },
+              {
+                "property": "gameState.teams[battingTeam].superGods.double",
+                "operation": "set",
+                "value": true
+              },
+              {
+                "property": "gameState.outs",
+                "operation": "increment",
+                "value": 2,
+                "max": 3
+              }
+            ],
+            "endTurn": true,
+            "nextPhase": "turn_complete"
+          },
+          {
+            "actionType": "no_action",
+            "stateChanges": [],
+            "nextPhase": 3
+          }
+        ]
+      },
+      {
+        "phaseId": 2,
+        "name": "challenge_defensive_gods",
+        "description": "Batting team may challenge Out card (not 2Out)",
+        "actors": ["battingTeam"],
+        "condition": "previousAction === 'play_out_card'",
+        "actions": [
+          {
+            "actionType": "challenge_out",
+            "condition": "gameState.teams[battingTeam].baseballGods.challenge > 0",
+            "stateChanges": [
+              {
+                "property": "gameState.teams[battingTeam].baseballGods.challenge",
+                "operation": "decrement",
+                "value": 1
+              }
+            ],
+            "nextPhase": 3
+          },
+          {
+            "actionType": "accept_out",
+            "stateChanges": [
+              {
+                "property": "gameState.outs",
+                "operation": "increment",
+                "value": 1
+              }
+            ],
+            "endTurn": true,
+            "nextPhase": "turn_complete"
+          }
+        ]
+      },
+      {
+        "phaseId": 3,
+        "name": "pitch",
+        "description": "Pitcher delivers pitch or intentional walk",
+        "actors": ["pitchingTeam"],
+        "actions": [
+          {
+            "actionType": "intentional_walk",
+            "stateChanges": [
+              {
+                "property": "gameState.bases",
+                "operation": "advance_runners",
+                "forced": true
+              },
+              {
+                "property": "gameState.bases.first",
+                "operation": "set",
+                "value": "gameState.currentBatter"
+              }
+            ],
+            "endTurn": true,
+            "nextPhase": "turn_complete"
+          },
+          {
+            "actionType": "roll_pitch",
+            "rollCount": "variable",
+            "maxRolls": 4,
+            "outcomes": [
+              {
+                "outcomeType": "automatic_out",
+                "condition": "roll > currentPitcher.thresholds[vsHandedness].out",
+                "stateChanges": [
+                  {
+                    "property": "gameState.outs",
+                    "operation": "increment",
+                    "value": 1
+                  }
+                ],
+                "endTurn": true,
+                "nextPhase": "turn_complete"
+              },
+              {
+                "outcomeType": "automatic_hit",
+                "condition": "roll > currentPitcher.thresholds[vsHandedness].hit",
+                "stateChanges": [
+                  {
+                    "property": "gameState.bases",
+                    "operation": "advance_runners",
+                    "spaces": 1
+                  },
+                  {
+                    "property": "gameState.bases.first",
+                    "operation": "set",
+                    "value": "gameState.currentBatter"
+                  },
+                  {
+                    "property": "gameState.turnState.hitType",
+                    "operation": "set",
+                    "value": "single"
+                  }
+                ],
+                "endTurn": true,
+                "nextPhase": "turn_complete"
+              },
+              {
+                "outcomeType": "walk",
+                "condition": "roll < currentPitcher.thresholds[vsHandedness].walk",
+                "stateChanges": [
+                  {
+                    "property": "gameState.bases",
+                    "operation": "advance_runners",
+                    "forced": true
+                  },
+                  {
+                    "property": "gameState.bases.first",
+                    "operation": "set",
+                    "value": "gameState.currentBatter"
+                  },
+                  {
+                    "property": "gameState.turnState.hitType",
+                    "operation": "set",
+                    "value": "walk"
+                  }
+                ],
+                "endTurn": true,
+                "nextPhase": "turn_complete"
+              },
+              {
+                "outcomeType": "pitch_delivered",
+                "condition": "default",
+                "stateChanges": [
+                  {
+                    "property": "gameState.turnState.pitchDelivered",
+                    "operation": "set",
+                    "value": true
+                  }
+                ],
+                "nextPhase": 4
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "phaseId": 4,
+        "name": "steal_attempt",
+        "description": "Batting team may attempt steal if runner on first and base open",
+        "actors": ["battingTeam"],
+        "condition": "gameState.bases.first !== null && gameState.bases.second === null",
+        "actions": [
+          {
+            "actionType": "attempt_steal",
+            "rollCount": "variable",
+            "maxRolls": 4,
+            "outcomes": [
+              {
+                "outcomeType": "steal_success",
+                "condition": "roll >= gameState.bases.first.stealThreshold",
+                "stateChanges": [
+                  {
+                    "property": "gameState.bases.second",
+                    "operation": "set",
+                    "value": "gameState.bases.first"
+                  },
+                  {
+                    "property": "gameState.bases.first",
+                    "operation": "set",
+                    "value": null
+                  }
+                ],
+                "nextPhase": 5
+              },
+              {
+                "outcomeType": "steal_out_with_two_outs",
+                "condition": "roll < gameState.bases.first.stealThreshold && gameState.outs === 2",
+                "stateChanges": [
+                  {
+                    "property": "gameState.outs",
+                    "operation": "increment",
+                    "value": 1
+                  },
+                  {
+                    "property": "gameState.bases.first",
+                    "operation": "set",
+                    "value": null
+                  }
+                ],
+                "endInning": true,
+                "batterStaysInLineup": true,
+                "nextPhase": "inning_complete"
+              },
+              {
+                "outcomeType": "steal_out",
+                "condition": "roll < gameState.bases.first.stealThreshold",
+                "stateChanges": [
+                  {
+                    "property": "gameState.outs",
+                    "operation": "increment",
+                    "value": 1
+                  },
+                  {
+                    "property": "gameState.bases.first",
+                    "operation": "set",
+                    "value": null
+                  }
+                ],
+                "nextPhase": 5
+              }
+            ]
+          },
+          {
+            "actionType": "no_steal",
+            "stateChanges": [],
+            "nextPhase": 5
+          }
+        ]
+      },
+      {
+        "phaseId": 5,
+        "name": "pinch_hit",
+        "description": "Batting team may pinch hit if current batter is multi-team",
+        "actors": ["battingTeam"],
+        "condition": "gameState.currentBatter.multiTeam === true",
+        "actions": [
+          {
+            "actionType": "pinch_hit",
+            "validation": "selectedBatter not in gameState.teams[battingTeam].discardedBatters",
+            "stateChanges": [
+              {
+                "property": "gameState.teams[battingTeam].discardedBatters",
+                "operation": "append",
+                "value": "gameState.currentBatter"
+              },
+              {
+                "property": "gameState.currentBatter",
+                "operation": "set",
+                "value": "selectedBatter"
+              }
+            ],
+            "nextPhase": 6
+          },
+          {
+            "actionType": "no_pinch_hit",
+            "stateChanges": [],
+            "nextPhase": 6
+          }
+        ]
+      },
+      {
+        "phaseId": 6,
+        "name": "offensive_baseball_gods",
+        "description": "Batting team may play Hit or Double super card",
+        "actors": ["battingTeam"],
+        "actions": [
+          {
+            "actionType": "play_hit_card",
+            "condition": "gameState.teams[battingTeam].baseballGods.hit > 0",
+            "stateChanges": [
+              {
+                "property": "gameState.teams[battingTeam].baseballGods.hit",
+                "operation": "decrement",
+                "value": 1
+              }
+            ],
+            "triggerPhase": 7
+          },
+          {
+            "actionType": "play_double_super_card",
+            "condition": "gameState.teams[battingTeam].superGods.double === true",
+            "stateChanges": [
+              {
+                "property": "gameState.teams[battingTeam].superGods.double",
+                "operation": "set",
+                "value": false
+              },
+              {
+                "property": "gameState.teams[pitchingTeam].superGods.twoOut",
+                "operation": "set",
+                "value": true
+              },
+              {
+                "property": "gameState.bases",
+                "operation": "advance_runners",
+                "spaces": 2
+              },
+              {
+                "property": "gameState.bases.second",
+                "operation": "set",
+                "value": "gameState.currentBatter"
+              },
+              {
+                "property": "gameState.turnState.hitType",
+                "operation": "set",
+                "value": "double"
+              }
+            ],
+            "nextPhase": 10
+          },
+          {
+            "actionType": "no_action",
+            "stateChanges": [],
+            "nextPhase": 8
+          }
+        ]
+      },
+      {
+        "phaseId": 7,
+        "name": "challenge_offensive_gods",
+        "description": "Pitching team may challenge Hit card (not Double super)",
+        "actors": ["pitchingTeam"],
+        "condition": "previousAction === 'play_hit_card'",
+        "actions": [
+          {
+            "actionType": "challenge_hit",
+            "condition": "gameState.teams[pitchingTeam].baseballGods.challenge > 0",
+            "stateChanges": [
+              {
+                "property": "gameState.teams[pitchingTeam].baseballGods.challenge",
+                "operation": "decrement",
+                "value": 1
+              }
+            ],
+            "nextPhase": 8
+          },
+          {
+            "actionType": "accept_hit",
+            "stateChanges": [
+              {
+                "property": "gameState.bases",
+                "operation": "advance_runners",
+                "spaces": 1
+              },
+              {
+                "property": "gameState.bases.first",
+                "operation": "set",
+                "value": "gameState.currentBatter"
+              },
+              {
+                "property": "gameState.turnState.hitType",
+                "operation": "set",
+                "value": "single"
+              }
+            ],
+            "nextPhase": 10
+          }
+        ]
+      },
+      {
+        "phaseId": 8,
+        "name": "swing_for_fences",
+        "description": "Batting team declares swing for fences",
+        "actors": ["battingTeam"],
+        "actions": [
+          {
+            "actionType": "swing_for_fences",
+            "stateChanges": [
+              {
+                "property": "gameState.turnState.swingingForFences",
+                "operation": "set",
+                "value": true
+              }
+            ],
+            "nextPhase": 9
+          },
+          {
+            "actionType": "normal_swing",
+            "stateChanges": [],
+            "nextPhase": 9
+          }
+        ]
+      },
+      {
+        "phaseId": 9,
+        "name": "swing",
+        "description": "Batter swings or bunts",
+        "actors": ["battingTeam"],
+        "actions": [
+          {
+            "actionType": "bunt",
+            "stateChanges": [
+              {
+                "property": "gameState.bases",
+                "operation": "advance_runners",
+                "spaces": 1
+              },
+              {
+                "property": "gameState.outs",
+                "operation": "increment",
+                "value": 1
+              }
+            ],
+            "endTurn": true,
+            "nextPhase": "turn_complete"
+          },
+          {
+            "actionType": "roll_swing",
+            "rollCount": "variable",
+            "maxRolls": 4,
+            "outcomes": [
+              {
+                "outcomeType": "out",
+                "condition": "roll < currentBatter.thresholds[vsPitcherHandedness].single",
+                "stateChanges": [
+                  {
+                    "property": "gameState.outs",
+                    "operation": "increment",
+                    "value": 1
+                  }
+                ],
+                "endTurn": true,
+                "nextPhase": "turn_complete"
+              },
+              {
+                "outcomeType": "single",
+                "condition": "roll >= currentBatter.thresholds.single && roll < currentBatter.thresholds.double",
+                "modifiers": [
+                  {
+                    "condition": "gameState.turnState.swingingForFences === true",
+                    "override": "out"
+                  }
+                ],
+                "stateChanges": [
+                  {
+                    "property": "gameState.bases",
+                    "operation": "advance_runners",
+                    "spaces": 1
+                  },
+                  {
+                    "property": "gameState.bases.first",
+                    "operation": "set",
+                    "value": "gameState.currentBatter"
+                  },
+                  {
+                    "property": "gameState.turnState.hitType",
+                    "operation": "set",
+                    "value": "single"
+                  }
+                ],
+                "nextPhase": 10
+              },
+              {
+                "outcomeType": "double",
+                "condition": "roll >= currentBatter.thresholds.double && roll < currentBatter.thresholds.triple",
+                "modifiers": [
+                  {
+                    "condition": "gameState.turnState.swingingForFences === true",
+                    "override": "homerun"
+                  }
+                ],
+                "stateChanges": [
+                  {
+                    "property": "gameState.bases",
+                    "operation": "advance_runners",
+                    "spaces": 2
+                  },
+                  {
+                    "property": "gameState.bases.second",
+                    "operation": "set",
+                    "value": "gameState.currentBatter"
+                  },
+                  {
+                    "property": "gameState.turnState.hitType",
+                    "operation": "set",
+                    "value": "double"
+                  }
+                ],
+                "nextPhase": 10
+              },
+              {
+                "outcomeType": "triple",
+                "condition": "roll >= currentBatter.thresholds.triple && roll < currentBatter.thresholds.homerun",
+                "modifiers": [
+                  {
+                    "condition": "gameState.turnState.swingingForFences === true",
+                    "override": "homerun"
+                  }
+                ],
+                "stateChanges": [
+                  {
+                    "property": "gameState.bases",
+                    "operation": "advance_runners",
+                    "spaces": 3
+                  },
+                  {
+                    "property": "gameState.bases.third",
+                    "operation": "set",
+                    "value": "gameState.currentBatter"
+                  },
+                  {
+                    "property": "gameState.turnState.hitType",
+                    "operation": "set",
+                    "value": "triple"
+                  }
+                ],
+                "nextPhase": 10
+              },
+              {
+                "outcomeType": "homerun",
+                "condition": "roll >= currentBatter.thresholds.homerun",
+                "stateChanges": [
+                  {
+                    "property": "gameState.score[battingTeam]",
+                    "operation": "increment",
+                    "value": "1 + count(gameState.bases not null)"
+                  },
+                  {
+                    "property": "gameState.bases",
+                    "operation": "clear_all"
+                  },
+                  {
+                    "property": "gameState.turnState.hitType",
+                    "operation": "set",
+                    "value": "homerun"
+                  }
+                ],
+                "endTurn": true,
+                "nextPhase": "turn_complete"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "phaseId": 10,
+        "name": "advance_runners",
+        "description": "Batting team may play Advance cards to move runners extra bases",
+        "actors": ["battingTeam"],
+        "condition": "gameState.turnState.hitType !== 'homerun' && any(gameState.bases not null)",
+        "actions": [
+          {
+            "actionType": "play_advance_card",
+            "validation": "gameState.teams[battingTeam].baseballGods.advance > 0",
+            "repeatable": true,
+            "maxRepeats": "gameState.teams[battingTeam].baseballGods.advance",
+            "stateChanges": [
+              {
+                "property": "gameState.teams[battingTeam].baseballGods.advance",
+                "operation": "decrement",
+                "value": 1
+              },
+              {
+                "property": "gameState.bases[selectedRunner]",
+                "operation": "advance_one_base"
+              },
+              {
+                "property": "gameState.score[battingTeam]",
+                "operation": "increment",
+                "value": 1,
+                "condition": "runner reaches home"
+              }
+            ],
+            "canContinue": true
+          },
+          {
+            "actionType": "finish_advancing",
+            "stateChanges": [],
+            "endTurn": true,
+            "nextPhase": "turn_complete"
+          }
+        ]
+      }
+    ]
+  },
+
+  "gameFlow": {
+    "description": "High-level game flow control",
+    "stages": [
+      {
+        "stage": "game_setup",
+        "steps": [
+          "validate_rosters",
+          "determine_home_visitor",
+          "initialize_baseball_gods",
+          "set_initial_state"
+        ],
+        "stateChanges": [
+          {
+            "property": "gameState.gameStatus",
+            "operation": "set",
+            "value": "in_progress"
+          }
+        ]
+      },
+      {
+        "stage": "inning_setup",
+        "steps": [
+          "select_pitchers",
+          "clear_bases",
+          "reset_outs",
+          "determine_batting_order"
+        ],
+        "stateChanges": [
+          {
+            "property": "gameState.outs",
+            "operation": "set",
+            "value": 0
+          },
+          {
+            "property": "gameState.bases",
+            "operation": "clear_all"
+          },
+          {
+            "property": "gameState.currentPitcher",
+            "operation": "set",
+            "value": "teams[pitchingTeam].pitchers[pitcherIndex]"
+          }
+        ]
+      },
+      {
+        "stage": "turn_execution",
+        "description": "Execute single turn through turn sequence",
+        "loop": "while gameState.outs < 3",
+        "stateChanges": [
+          {
+            "property": "gameState.turnState",
+            "operation": "reset"
+          },
+          {
+            "property": "gameState.currentBatter",
+            "operation": "set",
+            "value": "teams[battingTeam].batters[batterIndex]"
+          }
+        ]
+      },
+      {
+        "stage": "turn_complete",
+        "stateChanges": [
+          {
+            "property": "gameState.teams[battingTeam].batterIndex",
+            "operation": "increment",
+            "wrapAt": "length(gameState.teams[battingTeam].roster.batters)"
+          },
+          {
+            "property": "gameState.turnState",
+            "operation": "reset"
+          }
+        ],
+        "checkInningEnd": true
+      },
+      {
+        "stage": "half_inning_complete",
+        "conditions": [
+          "gameState.outs === 3"
+        ],
+        "stateChanges": [
+          {
+            "property": "gameState.currentHalf",
+            "operation": "toggle",
+            "values": ["top", "bottom"]
+          },
+          {
+            "property": "gameState.outs",
+            "operation": "set",
+            "value": 0
+          },
+          {
+            "property": "gameState.bases",
+            "operation": "clear_all"
+          },
+          {
+            "property": "gameState.battingTeam",
+            "operation": "swap_teams"
+          },
+          {
+            "property": "gameState.pitchingTeam",
+            "operation": "swap_teams"
+          }
+        ],
+        "checkInningEnd": true
+      },
+      {
+        "stage": "inning_complete",
+        "conditions": [
+          "gameState.currentHalf === 'bottom' && gameState.outs === 3",
+          "OR gameState.currentHalf === 'bottom' && gameState.currentInning >= 9 && gameState.score.home > gameState.score.visiting"
+        ],
+        "stateChanges": [
+          {
+            "property": "gameState.currentInning",
+            "operation": "increment",
+            "value": 1
+          },
+          {
+            "property": "gameState.currentHalf",
+            "operation": "set",
+            "value": "top"
+          }
+        ],
+        "checkGameEnd": true
+      },
+      {
+        "stage": "check_game_end",
+        "conditions": [
+          {
+            "condition": "gameState.currentInning > 9 && gameState.currentHalf === 'top' && gameState.score.home > gameState.score.visiting",
+            "result": "game_over",
+            "winner": "home"
+          },
+          {
+            "condition": "gameState.currentInning >= 9 && gameState.currentHalf === 'bottom' && gameState.outs === 3 && gameState.score.visiting > gameState.score.home",
+            "result": "game_over",
+            "winner": "visiting"
+          },
+          {
+            "condition": "gameState.currentInning >= 9 && gameState.currentHalf === 'bottom' && gameState.outs === 3 && gameState.score.home !== gameState.score.visiting",
+            "result": "game_over",
+            "winner": "conditional"
+          },
+          {
+            "condition": "default",
+            "result": "continue",
+            "nextStage": "inning_setup"
+          }
+        ]
+      },
+      {
+        "stage": "game_over",
+        "stateChanges": [
+          {
+            "property": "gameState.gameStatus",
+            "operation": "set",
+            "value": "completed"
+          },
+          {
+            "property": "gameState.winner",
+            "operation": "set",
+            "value": "determined_winner"
+          }
+        ]
+      }
+    ]
+  },
+
+  "validations": {
+    "roster_validation": {
+      "total_players": {
+        "min": 60,
+        "max": 60,
+        "composition": {
+          "batters": 50,
+          "pitchers": 10
+        }
+      },
+      "reliever_limit": {
+        "max": 4,
+        "definition": "pitcher.stats.inningsPitched / gamesPlayed <= 3"
+      },
+      "salary_cap": {
+        "total": 300,
+        "calculation": "sum(all player.ranking)"
+      },
+      "unique_players": {
+        "rule": "no duplicate playerName across roster"
+      }
+    },
+    "card_legality": {
+      "batter_requirements": [
+        "stats.average !== null",
+        "stats.doubles !== null",
+        "stats.triples !== null",
+        "stats.homeruns !== null",
+        "stats.stolenBases !== null",
+        "stats.atBats !== null",
+        "handedness !== null"
+      ],
+      "pitcher_requirements": [
+        "stats.era !== null",
+        "stats.inningsPitched !== null",
+        "stats.walks !== null",
+        "handedness !== null"
+      ]
+    },
+    "action_validation": {
+      "steal_requirements": [
+        "gameState.bases.first !== null",
+        "gameState.bases.second === null",
+        "gameState.turnState.pitchDelivered === true"
+      ],
+      "pinch_hit_requirements": [
+        "gameState.currentBatter.multiTeam === true",
+        "selectedBatter not in discardedBatters"
+      ],
+      "baseball_gods_requirements": {
+        "hit": "gameState.teams[team].baseballGods.hit > 0",
+        "out": "gameState.teams[team].baseballGods.out > 0",
+        "advance": "gameState.teams[team].baseballGods.advance > 0",
+        "challenge": "gameState.teams[team].baseballGods.challenge > 0"
+      }
+    }
+  },
+
+  "historyTracking": {
+    "description": "Complete game history structure for replay and analysis",
+    "eventLog": {
+      "type": "array",
+      "items": {
+        "eventId": "string",
+        "timestamp": "datetime",
+        "inning": "integer",
+        "half": "enum[top, bottom]",
+        "outs": "integer",
+        "battingTeam": "string",
+        "pitchingTeam": "string",
+        "batter": "PlayerCard",
+        "pitcher": "PitcherCard",
+        "basesBefore": "object",
+        "basesAfter": "object",
+        "scoreBefore": "object",
+        "scoreAfter": "object",
+        "eventType": {
+          "type": "enum",
+          "values": [
+            "pitch",
+            "swing",
+            "hit",
+            "out",
+            "walk",
+            "steal",
+            "pinch_hit",
+            "baseball_gods_played",
+            "challenge",
+            "advance_runner",
+            "score",
+            "inning_end",
+            "game_end"
+          ]
+        },
+        "eventDetails": "object",
+        "diceRolls": "array[DiceRoll]",
+        "stateSnapshot": "gameState"
+      }
+    },
+    "statistics": {
+      "team_stats": {
+        "runs": "integer",
+        "hits": "integer",
+        "errors": "integer",
+        "leftOnBase": "integer"
+      },
+      "player_stats": {
+        "batters": {
+          "atBats": "integer",
+          "hits": "integer",
+          "runs": "integer",
+          "rbis": "integer",
+          "walks": "integer",
+          "strikeouts": "integer"
+        },
+        "pitchers": {
+          "inningsPitched": "float",
+          "hitsAllowed": "integer",
+          "runsAllowed": "integer",
+          "walksAllowed": "integer",
+          "outsRecorded": "integer"
+        }
+      }
+    }
+  },
+
+  "specialRules": {
+    "running_out_of_pitchers": {
+      "trigger": "gameState.teams[team].pitcherIndex >= length(gameState.teams[team].roster.pitchers)",
+      "action": "opponent_selects_pitcher_from_own_discard_pile",
+      "stateChange": {
+        "property": "gameState.teams[team].currentPitcher",
+        "operation": "set",
+        "value": "opponent_selected_weak_pitcher"
+      }
+    },
+    "running_out_of_batters": {
+      "trigger": "gameState.teams[team].batterIndex >= length(gameState.teams[team].roster.batters) - length(gameState.teams[team].discardedBatters)",
+      "action": "opponent_selects_non_scoring_batter_from_own_team",
+      "stateChange": {
+        "property": "gameState.currentBatter",
+        "operation": "set",
+        "value": "opponent_selected_weak_batter"
+      }
+    },
+    "skip_bottom_ninth": {
+      "trigger": "gameState.currentInning === 9 && gameState.currentHalf === 'top' && gameState.outs === 3 && gameState.score.home > gameState.score.visiting",
+      "action": "end_game",
+      "stateChange": {
+        "property": "gameState.gameStatus",
+        "operation": "set",
+        "value": "completed"
+      }
+    },
+    "switch_hitter": {
+      "trigger": "gameState.currentBatter.handedness === 'B'",
+      "effect": "use opposite handedness vs pitcher",
+      "implementation": {
+        "if": "gameState.currentPitcher.handedness === 'R'",
+        "then": "use currentBatter.thresholds.vsRight",
+        "else": "use currentBatter.thresholds.vsLeft"
+      }
+    },
+    "super_gods_trading": {
+      "trigger": "team uses superGods[type]",
+      "effect": {
+        "property": "gameState.teams[opposingTeam].superGods[otherType]",
+        "operation": "set",
+        "value": true
+      },
+      "mapping": {
+        "double": "twoOut",
+        "twoOut": "double"
+      }
+    }
+  },
+
+  "interpreterInstructions": {
+    "execution_order": [
+      "Load and validate rosters",
+      "Initialize game state",
+      "Execute game_setup stage",
+      "Loop: Execute inning_setup for each inning",
+      "Loop: Execute turn_sequence for each batter until 3 outs",
+      "Check half_inning_complete conditions",
+      "Check inning_complete conditions",
+      "Check game_end conditions",
+      "Log all events to historyTracking.eventLog",
+      "Calculate final statistics",
+      "Return complete game state and history"
+    ],
+    "state_management": {
+      "immutability": "Create new state object for each event",
+      "history": "Store complete state snapshot after each event",
+      "rollback": "Support rollback to any previous state"
+    },
+    "random_number_generation": {
+      "method": "Cryptographically secure random for competitive play",
+      "seed": "Support seeded random for replay",
+      "logging": "Log all dice rolls with timestamps"
+    },
+    "automation_hooks": {
+      "decision_points": "Allow AI or human input at each action phase",
+      "validation": "Validate all actions before execution",
+      "undo": "Support undo of last action",
+      "pause_resume": "Support pause and resume of game state"
+    }
+  }
+}
+
