@@ -118,32 +118,59 @@
         };
     }
 
+    // Convert raw value to base-6 4-digit representation
+    // This is used for pitching thresholds where raw value is already in 0-1295 range
+    function rawValueToBase6(rawValue) {
+        // Clamp raw value to valid range
+        const clampedValue = Math.max(0, Math.min(1295, Math.round(rawValue)));
+        const base6Value = Math.round(1295 - clampedValue);
+        
+        if (base6Value <= 0) return [6, 6, 6, 6];
+        if (base6Value >= 1295) return [1, 1, 1, 1];
+        
+        const digit4 = Math.floor(base6Value / 216) + 1;
+        const digit3 = Math.floor((base6Value % 216) / 36) + 1;
+        const digit2 = Math.floor((base6Value % 36) / 6) + 1;
+        const digit1 = (base6Value % 6) + 1;
+        
+        return [digit4, digit3, digit2, digit1];
+    }
+
     // Calculate pitching thresholds
     function calculatePitchingThresholds(stats, pitcherHandedness) {
-        const { IPouts, ER, BB } = stats;
+        const { IPouts, ER, BB, ERA } = stats;
         
         if (!IPouts || IPouts === 0) {
             return null;
         }
         
         const inningsPitched = IPouts / 3;
-        const era = ER / inningsPitched;
+        // Use ERA from stats if available, otherwise calculate it
+        const era = ERA !== undefined && ERA !== null ? ERA : (ER / inningsPitched);
         
         // Calculate RH advantage
         const rhBase = pitcherHandedness === 'R' ? 4.15 : 3.85;
         const rhAdvantage = rhBase - era;
         const rhHeader = rhAdvantage >= 0 ? 'OUT/RH' : 'HIT/RH';
-        const rhRawValue = Math.abs(rhAdvantage) * 100;
+        // Convert advantage to raw value (multiply by 100) for dice calculation
+        // Cap at 1000 since we divide by 1000 to get probability (0-1 range)
+        const rhRawValue = Math.min(1000, Math.abs(rhAdvantage) * 100);
         
         // Calculate LH advantage
         const lhBase = pitcherHandedness === 'L' ? 4.15 : 3.85;
         const lhAdvantage = lhBase - era;
         const lhHeader = lhAdvantage >= 0 ? 'OUT/LH' : 'HIT/LH';
-        const lhRawValue = Math.abs(lhAdvantage) * 100;
+        // Convert advantage to raw value (multiply by 100) for dice calculation
+        // Cap at 1000 since we divide by 1000 to get probability (0-1 range)
+        const lhRawValue = Math.min(1000, Math.abs(lhAdvantage) * 100);
         
-        // Calculate BB threshold
+        // Calculate BB threshold using Excel formula logic
+        // Z3 = 1000 - ROUND(V3/(U3*5), 3) * 1000
         const bbRawValue = 1000 - Math.round((BB / (inningsPitched * 5)) * 1000) / 1000 * 1000;
         
+        // Convert raw values to 4-digit base-6 dice thresholds
+        // Treat the raw values as probabilities (divide by 1000 to get 0-1 range)
+        // This matches the app's DiceGrid.tsx implementation
         return {
             rhHeader: rhHeader,
             rhThreshold: probabilityToBase6(rhRawValue / 1000),
