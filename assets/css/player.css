@@ -1,0 +1,318 @@
+/**
+ * Player Detail Page Styles
+ * Responsive styles for player statistics and dice roll probabilities
+ */
+
+/* Loading and Error States */
+.loading-container,
+.error-container {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.loading-container i {
+    font-size: 3rem;
+    color: #41ab5d;
+    margin-bottom: 1rem;
+}
+
+.loading-container p,
+.error-container p {
+    font-size: 1.25rem;
+    color: #555555;
+}
+
+.error-container p {
+    color: #e2212f;
+}
+
+/* Player Header */
+.player-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: solid 1px rgba(0, 0, 0, 0.25);
+}
+
+.player-header h1 {
+    margin-bottom: 0.5rem;
+    color: #555555;
+}
+
+.player-subtitle {
+    font-size: 1.25rem;
+    color: #888888;
+    margin: 0;
+}
+
+/* Player Sections */
+.player-section {
+    margin-bottom: 3rem;
+}
+
+.player-section h2 {
+    margin-bottom: 1.5rem;
+    color: #555555;
+    text-align: center;
+}
+
+.player-section h3 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    color: #555555;
+    text-align: left;
+}
+
+/* Bio Grid */
+.bio-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.bio-item {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.025);
+    border-radius: 4px;
+}
+
+.bio-label {
+    font-weight: 600;
+    color: #555555;
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.bio-value {
+    color: #444444;
+    font-size: 1rem;
+}
+
+/* Stats Tables */
+.stats-table-container {
+    margin-bottom: 2rem;
+}
+
+.stats-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+    background: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.stats-table thead {
+    background-color: #41ab5d;
+    color: #ffffff;
+}
+
+.stats-table th {
+    padding: 0.75rem;
+    text-align: center;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.stats-table th:last-child {
+    border-right: none;
+}
+
+.stats-table tbody tr {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.stats-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.stats-table td {
+    padding: 0.75rem;
+    text-align: center;
+    color: #444444;
+}
+
+.stats-table tbody tr:nth-child(even) {
+    background-color: rgba(0, 0, 0, 0.025);
+}
+
+/* Dice Grid Styles */
+.dice-grid-wrapper {
+    margin-bottom: 2rem;
+}
+
+.dice-grid {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+}
+
+.dice-grid-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #555555;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+}
+
+.dice-grid-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.025);
+}
+
+.dice-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.75rem;
+    background: #ffffff;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.dice-header {
+    font-weight: 600;
+    color: #555555;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.dice-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 120px;
+    justify-content: center;
+}
+
+.dice-face {
+    font-size: 2rem;
+    color: #8B0000;
+    line-height: 1;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 980px) {
+    .dice-grid-content {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    }
+    
+    .dice-face {
+        font-size: 1.75rem;
+    }
+    
+    .bio-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+}
+
+@media screen and (max-width: 736px) {
+    .player-header h1 {
+        font-size: 2rem;
+    }
+    
+    .player-subtitle {
+        font-size: 1rem;
+    }
+    
+    .dice-grid-content {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+        padding: 0.75rem;
+    }
+    
+    .dice-column {
+        padding: 0.5rem;
+    }
+    
+    .dice-header {
+        font-size: 0.8rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .dice-stack {
+        min-height: 100px;
+        gap: 0.25rem;
+    }
+    
+    .dice-face {
+        font-size: 1.5rem;
+    }
+    
+    .bio-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats-table {
+        font-size: 0.9rem;
+    }
+    
+    .stats-table th,
+    .stats-table td {
+        padding: 0.5rem 0.25rem;
+    }
+    
+    /* Make stats table scrollable on mobile */
+    .stats-table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .stats-table {
+        min-width: 500px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .dice-grid-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .dice-stack {
+        flex-direction: row;
+        justify-content: center;
+        min-height: auto;
+        gap: 0.5rem;
+    }
+    
+    .dice-face {
+        font-size: 1.25rem;
+    }
+    
+    .player-header {
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+    }
+    
+    .player-section {
+        margin-bottom: 2rem;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .dice-grid {
+        page-break-inside: avoid;
+    }
+    
+    .stats-table-container {
+        page-break-inside: avoid;
+    }
+}
+

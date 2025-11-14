@@ -1,0 +1,102 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <title>Player Details - Commons Baseball</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <link rel="stylesheet" href="assets/css/player.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    <link rel="icon" type="image/png" href="favicon.png" />
+</head>
+
+<body class="is-preload">
+
+    <!-- Header -->
+    <header id="header">
+        <a class="logo" href="index.html">Commons Baseball</a>
+    </header>
+
+    <!-- Nav -->
+    <nav id="menu">
+        <ul class="links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main -->
+    <section id="main" class="wrapper">
+        <div class="inner">
+            <div class="content">
+                <!-- Loading State -->
+                <div id="loading-state" class="loading-container">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading player data...</p>
+                </div>
+
+                <!-- Error State -->
+                <div id="error-state" class="error-container" style="display: none;">
+                    <p>Unable to load player data. Redirecting...</p>
+                </div>
+
+                <!-- Player Content -->
+                <div id="player-content" style="display: none;">
+                    <!-- Player Header -->
+                    <div id="player-header" class="player-header">
+                        <h1 id="player-name"></h1>
+                        <p id="player-year-teams" class="player-subtitle"></p>
+                    </div>
+
+                    <!-- Player Bio -->
+                    <div id="player-bio" class="player-section" style="display: none;">
+                        <h2>Player Information</h2>
+                        <div id="bio-content" class="bio-grid"></div>
+                    </div>
+
+                    <!-- Batting Statistics -->
+                    <div id="batting-section" class="player-section" style="display: none;">
+                        <h2>Batting Statistics</h2>
+                        <div id="batting-stats"></div>
+                    </div>
+
+                    <!-- Pitching Statistics -->
+                    <div id="pitching-section" class="player-section" style="display: none;">
+                        <h2>Pitching Statistics</h2>
+                        <div id="pitching-stats"></div>
+                    </div>
+
+                    <!-- Dice Roll Probabilities -->
+                    <div id="dice-section" class="player-section" style="display: none;">
+                        <h2>Dice Roll Probabilities</h2>
+                        <div id="dice-content"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="footer">
+        <div class="inner">
+            <div class="copyright">
+                &copy; 2025 Pangaeo Solutions Inc. Photos from <a href="https://www.unsplash.com">Unsplash</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/player.js"></script>
+
+</body>
+
+</html>
+
