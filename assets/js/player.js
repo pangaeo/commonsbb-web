@@ -90,6 +90,33 @@
         return [digit4, digit3, digit2, digit1];
     }
 
+    // Aggregate batting stats across all teams for a year
+    function aggregateBattingStats(battingStatsArray) {
+        if (!battingStatsArray || battingStatsArray.length === 0) {
+            return null;
+        }
+        
+        const aggregated = {
+            AB: 0,
+            H: 0,
+            '2B': 0,
+            '3B': 0,
+            HR: 0,
+            SB: 0
+        };
+        
+        battingStatsArray.forEach(stat => {
+            aggregated.AB += stat.AB || 0;
+            aggregated.H += stat.H || 0;
+            aggregated['2B'] += stat['2B'] || 0;
+            aggregated['3B'] += stat['3B'] || 0;
+            aggregated.HR += stat.HR || 0;
+            aggregated.SB += stat.SB || 0;
+        });
+        
+        return aggregated;
+    }
+
     // Calculate batting thresholds
     function calculateBattingThresholds(stats) {
         const { AB, H, '2B': doubles = 0, '3B': triples = 0, HR = 0, SB = 0 } = stats;
@@ -136,6 +163,34 @@
         return [digit4, digit3, digit2, digit1];
     }
 
+    // Aggregate pitching stats across all teams for a year
+    // This correctly calculates ERA by summing ER and IPouts, then calculating ERA = total ER / total IP
+    function aggregatePitchingStats(pitchingStatsArray) {
+        if (!pitchingStatsArray || pitchingStatsArray.length === 0) {
+            return null;
+        }
+        
+        const aggregated = {
+            IPouts: 0,
+            ER: 0,
+            BB: 0,
+            H: 0
+        };
+        
+        pitchingStatsArray.forEach(stat => {
+            aggregated.IPouts += stat.IPouts || 0;
+            aggregated.ER += stat.ER || 0;
+            aggregated.BB += stat.BB || 0;
+            aggregated.H += stat.H || 0;
+        });
+        
+        // Calculate ERA correctly: total ER / total IP (not average of ERAs)
+        const inningsPitched = aggregated.IPouts / 3;
+        aggregated.ERA = inningsPitched > 0 ? aggregated.ER / inningsPitched : 0;
+        
+        return aggregated;
+    }
+
     // Calculate pitching thresholds
     function calculatePitchingThresholds(stats, pitcherHandedness) {
         const { IPouts, ER, BB, ERA } = stats;
@@ -146,6 +201,7 @@
         
         const inningsPitched = IPouts / 3;
         // Use ERA from stats if available, otherwise calculate it
+        // For aggregated stats, ERA should already be calculated correctly
         const era = ERA !== undefined && ERA !== null ? ERA : (ER / inningsPitched);
         
         // Calculate RH advantage
@@ -460,40 +516,40 @@
                 document.getElementById('pitching-section').style.display = 'block';
             }
             
-            // Calculate and render dice probabilities
+            // Calculate and render dice probabilities (aggregated across all teams)
             const diceHtml = [];
             
-            // Batting dice grids
+            // Batting dice grid (aggregated across all teams)
             if (playerStats.batting && playerStats.batting.length > 0) {
-                playerStats.batting.forEach((battingStat, index) => {
-                    const thresholds = calculateBattingThresholds(battingStat);
+                const aggregatedBatting = aggregateBattingStats(playerStats.batting);
+                if (aggregatedBatting) {
+                    const thresholds = calculateBattingThresholds(aggregatedBatting);
                     if (thresholds) {
-                        const teamLabel = playerStats.batting.length > 1 ? ` (${battingStat.team})` : '';
                         diceHtml.push(`
                             <div class="dice-grid-wrapper">
-                                <h3>${params.y}${teamLabel}</h3>
+                                <h3>${params.y}</h3>
                                 ${renderBattingDiceGrid(thresholds)}
                             </div>
                         `);
                     }
-                });
+                }
             }
             
-            // Pitching dice grids
+            // Pitching dice grid (aggregated across all teams)
             if (playerStats.pitching && playerStats.pitching.length > 0) {
                 const pitcherHandedness = playerDetails.throws || 'R';
-                playerStats.pitching.forEach((pitchingStat, index) => {
-                    const thresholds = calculatePitchingThresholds(pitchingStat, pitcherHandedness);
+                const aggregatedPitching = aggregatePitchingStats(playerStats.pitching);
+                if (aggregatedPitching) {
+                    const thresholds = calculatePitchingThresholds(aggregatedPitching, pitcherHandedness);
                     if (thresholds) {
-                        const teamLabel = playerStats.pitching.length > 1 ? ` (${pitchingStat.team})` : '';
                         diceHtml.push(`
                             <div class="dice-grid-wrapper">
-                                <h3>${params.y}${teamLabel}</h3>
+                                <h3>${params.y}</h3>
                                 ${renderPitchingDiceGrid(thresholds)}
                             </div>
                         `);
                     }
-                });
+                }
             }
             
             if (diceHtml.length > 0) {
