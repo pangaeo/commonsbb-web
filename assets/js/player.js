@@ -73,19 +73,25 @@
     }
 
     // Convert probability to base-6 4-digit representation
+    // Matches commonsbb/src/utils/DiceSystem.ts implementation exactly
     function probabilityToBase6(probability) {
         if (probability <= 0) return [6, 6, 6, 6];
         if (probability >= 1) return [1, 1, 1, 1];
         
+        // Convert probability to base-6 value (0-1295 range)
         const base6Value = Math.round(1295 - (1295 * probability));
         
-        if (base6Value <= 0) return [6, 6, 6, 6];
-        if (base6Value >= 1295) return [1, 1, 1, 1];
+        // Use roundedValue for consistency with correct implementation
+        const roundedValue = Math.round(base6Value);
         
-        const digit4 = Math.floor(base6Value / 216) + 1;
-        const digit3 = Math.floor((base6Value % 216) / 36) + 1;
-        const digit2 = Math.floor((base6Value % 36) / 6) + 1;
-        const digit1 = (base6Value % 6) + 1;
+        if (roundedValue <= 0) return [6, 6, 6, 6];
+        if (roundedValue >= 1295) return [1, 1, 1, 1];
+        
+        // Convert to 4-digit base-6 representation (matching base6ValueToDice)
+        const digit4 = Math.floor(roundedValue / 216) + 1; // 6^3
+        const digit3 = Math.floor((roundedValue % 216) / 36) + 1; // 6^2
+        const digit2 = Math.floor((roundedValue % 36) / 6) + 1; // 6^1
+        const digit1 = (roundedValue % 6) + 1; // 6^0
         
         return [digit4, digit3, digit2, digit1];
     }
@@ -164,7 +170,7 @@
     }
 
     // Aggregate pitching stats across all teams for a year
-    // This correctly calculates ERA by summing ER and IPouts, then calculating ERA = total ER / total IP
+    // This correctly calculates ERA by summing ER and IPouts, then calculating ERA = (total ER / total IP) * 9
     function aggregatePitchingStats(pitchingStatsArray) {
         if (!pitchingStatsArray || pitchingStatsArray.length === 0) {
             return null;
@@ -184,9 +190,9 @@
             aggregated.H += stat.H || 0;
         });
         
-        // Calculate ERA correctly: total ER / total IP (not average of ERAs)
+        // Calculate ERA correctly: (total ER / total IP) * 9 (ERA is runs per 9 innings)
         const inningsPitched = aggregated.IPouts / 3;
-        aggregated.ERA = inningsPitched > 0 ? aggregated.ER / inningsPitched : 0;
+        aggregated.ERA = inningsPitched > 0 ? (aggregated.ER / inningsPitched) * 9 : 0;
         
         return aggregated;
     }
@@ -238,7 +244,7 @@
             rhThreshold: rhThreshold, // probabilityToBase6 already returns an array
             lhHeader: lhHeader,
             lhThreshold: lhThreshold, // probabilityToBase6 already returns an array
-            bbThreshold: numericThresholdToBase6(walkThreshold)
+            bbThreshold: numericThresholdToBase6(walkThreshold) // Keep walk threshold as-is (user confirmed it's correct)
         };
     }
 
