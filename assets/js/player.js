@@ -225,18 +225,19 @@
         // Z3 = 1000 - ROUND(V3/(U3*5), 3) * 1000
         const z3 = 1000 - (Math.round((BB / (inningsPitched * 5)) * 1000) / 1000) * 1000;
         
-        // Convert raw values to numeric thresholds (0-1295 range) - matches API dice-system.ts exactly
+        // Convert raw values to 4-digit base-6 dice thresholds
+        // Use probabilityToBase6 directly (same as correct implementation in commonsbb)
         // Treat the raw values as probabilities (divide by 1000 to get 0-1 range)
-        const rhThreshold = Math.round(1295 - 1295 * (rhRawValue / 1000));
-        const lhThreshold = Math.round(1295 - 1295 * (lhRawValue / 1000));
+        const rhThreshold = probabilityToBase6(rhRawValue / 1000);
+        const lhThreshold = probabilityToBase6(lhRawValue / 1000);
         const walkThreshold = Math.round(z3 / 1000);
         
         // Convert numeric thresholds to base-6 digits for display
         return {
             rhHeader: rhHeader,
-            rhThreshold: numericThresholdToBase6(rhThreshold),
+            rhThreshold: rhThreshold, // probabilityToBase6 already returns an array
             lhHeader: lhHeader,
-            lhThreshold: numericThresholdToBase6(lhThreshold),
+            lhThreshold: lhThreshold, // probabilityToBase6 already returns an array
             bbThreshold: numericThresholdToBase6(walkThreshold)
         };
     }
