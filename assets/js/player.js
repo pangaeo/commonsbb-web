@@ -145,20 +145,20 @@
         };
     }
 
-    // Convert raw value to base-6 4-digit representation
-    // This is used for pitching thresholds where raw value is already in 0-1295 range
-    function rawValueToBase6(rawValue) {
-        // Clamp raw value to valid range
-        const clampedValue = Math.max(0, Math.min(1295, Math.round(rawValue)));
-        const base6Value = Math.round(1295 - clampedValue);
+    // Convert numeric threshold (0-1295) to base-6 4-digit representation
+    // This matches the API's dice-system.ts implementation
+    function numericThresholdToBase6(numericThreshold) {
+        // Clamp to valid range
+        const threshold = Math.max(0, Math.min(1295, Math.round(numericThreshold)));
         
-        if (base6Value <= 0) return [6, 6, 6, 6];
-        if (base6Value >= 1295) return [1, 1, 1, 1];
+        if (threshold <= 0) return [6, 6, 6, 6];
+        if (threshold >= 1295) return [1, 1, 1, 1];
         
-        const digit4 = Math.floor(base6Value / 216) + 1;
-        const digit3 = Math.floor((base6Value % 216) / 36) + 1;
-        const digit2 = Math.floor((base6Value % 36) / 6) + 1;
-        const digit1 = (base6Value % 6) + 1;
+        // Convert numeric threshold directly to base-6 digits
+        const digit4 = Math.floor(threshold / 216) + 1;
+        const digit3 = Math.floor((threshold % 216) / 36) + 1;
+        const digit2 = Math.floor((threshold % 36) / 6) + 1;
+        const digit1 = (threshold % 6) + 1;
         
         return [digit4, digit3, digit2, digit1];
     }
@@ -207,32 +207,37 @@
         // Calculate RH advantage
         const rhBase = pitcherHandedness === 'R' ? 4.15 : 3.85;
         const rhAdvantage = rhBase - era;
+        const rhAction = rhAdvantage > 0 ? 'out' : 'hit';
         const rhHeader = rhAdvantage >= 0 ? 'OUT/RH' : 'HIT/RH';
-        // Convert advantage to raw value (multiply by 1000 to get 0-1295 range)
-        // Cap at 1295 since that's the max for base-6 conversion
-        const rhRawValue = Math.min(1295, Math.abs(rhAdvantage) * 1000);
+        
+        // Convert advantage to raw value (multiply by 100) for dice calculation
+        const rhRawValue = Math.abs(rhAdvantage) * 100;
         
         // Calculate LH advantage
         const lhBase = pitcherHandedness === 'L' ? 4.15 : 3.85;
         const lhAdvantage = lhBase - era;
+        const lhAction = lhAdvantage > 0 ? 'out' : 'hit';
         const lhHeader = lhAdvantage >= 0 ? 'OUT/LH' : 'HIT/LH';
-        // Convert advantage to raw value (multiply by 1000 to get 0-1295 range)
-        // Cap at 1295 since that's the max for base-6 conversion
-        const lhRawValue = Math.min(1295, Math.abs(lhAdvantage) * 1000);
+        
+        const lhRawValue = Math.abs(lhAdvantage) * 100;
         
         // Calculate BB threshold using Excel formula logic
         // Z3 = 1000 - ROUND(V3/(U3*5), 3) * 1000
-        const bbRawValue = 1000 - Math.round((BB / (inningsPitched * 5)) * 1000) / 1000 * 1000;
+        const z3 = 1000 - (Math.round((BB / (inningsPitched * 5)) * 1000) / 1000) * 1000;
         
-        // Convert raw values to 4-digit base-6 dice thresholds
-        // Use rawValueToBase6 for OUT/HIT thresholds (raw value in 0-1295 range)
-        // Use probabilityToBase6 for BB threshold (probability 0-1 range)
+        // Convert raw values to numeric thresholds (0-1295 range) - matches API dice-system.ts exactly
+        // Treat the raw values as probabilities (divide by 1000 to get 0-1 range)
+        const rhThreshold = Math.round(1295 - 1295 * (rhRawValue / 1000));
+        const lhThreshold = Math.round(1295 - 1295 * (lhRawValue / 1000));
+        const walkThreshold = Math.round(z3 / 1000);
+        
+        // Convert numeric thresholds to base-6 digits for display
         return {
             rhHeader: rhHeader,
-            rhThreshold: rawValueToBase6(rhRawValue),
+            rhThreshold: numericThresholdToBase6(rhThreshold),
             lhHeader: lhHeader,
-            lhThreshold: rawValueToBase6(lhRawValue),
-            bbThreshold: probabilityToBase6(bbRawValue / 1000)
+            lhThreshold: numericThresholdToBase6(lhThreshold),
+            bbThreshold: numericThresholdToBase6(walkThreshold)
         };
     }
 
