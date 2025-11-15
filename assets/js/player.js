@@ -208,30 +208,30 @@
         const rhBase = pitcherHandedness === 'R' ? 4.15 : 3.85;
         const rhAdvantage = rhBase - era;
         const rhHeader = rhAdvantage >= 0 ? 'OUT/RH' : 'HIT/RH';
-        // Convert advantage to raw value (multiply by 100) for dice calculation
-        // Cap at 1000 since we divide by 1000 to get probability (0-1 range)
-        const rhRawValue = Math.min(1000, Math.abs(rhAdvantage) * 100);
+        // Convert advantage to raw value (multiply by 1000 to get 0-1295 range)
+        // Cap at 1295 since that's the max for base-6 conversion
+        const rhRawValue = Math.min(1295, Math.abs(rhAdvantage) * 1000);
         
         // Calculate LH advantage
         const lhBase = pitcherHandedness === 'L' ? 4.15 : 3.85;
         const lhAdvantage = lhBase - era;
         const lhHeader = lhAdvantage >= 0 ? 'OUT/LH' : 'HIT/LH';
-        // Convert advantage to raw value (multiply by 100) for dice calculation
-        // Cap at 1000 since we divide by 1000 to get probability (0-1 range)
-        const lhRawValue = Math.min(1000, Math.abs(lhAdvantage) * 100);
+        // Convert advantage to raw value (multiply by 1000 to get 0-1295 range)
+        // Cap at 1295 since that's the max for base-6 conversion
+        const lhRawValue = Math.min(1295, Math.abs(lhAdvantage) * 1000);
         
         // Calculate BB threshold using Excel formula logic
         // Z3 = 1000 - ROUND(V3/(U3*5), 3) * 1000
         const bbRawValue = 1000 - Math.round((BB / (inningsPitched * 5)) * 1000) / 1000 * 1000;
         
         // Convert raw values to 4-digit base-6 dice thresholds
-        // Treat the raw values as probabilities (divide by 1000 to get 0-1 range)
-        // This matches the app's DiceGrid.tsx implementation
+        // Use rawValueToBase6 for OUT/HIT thresholds (raw value in 0-1295 range)
+        // Use probabilityToBase6 for BB threshold (probability 0-1 range)
         return {
             rhHeader: rhHeader,
-            rhThreshold: probabilityToBase6(rhRawValue / 1000),
+            rhThreshold: rawValueToBase6(rhRawValue),
             lhHeader: lhHeader,
-            lhThreshold: probabilityToBase6(lhRawValue / 1000),
+            lhThreshold: rawValueToBase6(lhRawValue),
             bbThreshold: probabilityToBase6(bbRawValue / 1000)
         };
     }
