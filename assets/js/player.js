@@ -236,7 +236,7 @@
         // Treat the raw values as probabilities (divide by 1000 to get 0-1 range)
         const rhThreshold = probabilityToBase6(rhRawValue / 1000);
         const lhThreshold = probabilityToBase6(lhRawValue / 1000);
-        const walkThreshold = Math.round(z3 / 1000);
+        const bbThreshold = probabilityToBase6(z3 / 1000);
         
         // Convert numeric thresholds to base-6 digits for display
         return {
@@ -244,7 +244,7 @@
             rhThreshold: rhThreshold, // probabilityToBase6 already returns an array
             lhHeader: lhHeader,
             lhThreshold: lhThreshold, // probabilityToBase6 already returns an array
-            bbThreshold: numericThresholdToBase6(walkThreshold) // Keep walk threshold as-is (user confirmed it's correct)
+            bbThreshold: bbThreshold // probabilityToBase6 already returns an array
         };
     }
 
