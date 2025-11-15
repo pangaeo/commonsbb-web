@@ -517,12 +517,15 @@
             }
             
             // Calculate and render dice probabilities (aggregated across all teams)
+            // Clear any existing dice content first
+            const diceContentEl = document.getElementById('dice-content');
+            diceContentEl.innerHTML = '';
             const diceHtml = [];
             
-            // Batting dice grid (aggregated across all teams)
+            // Batting dice grid (aggregated across all teams) - only one grid regardless of team count
             if (playerStats.batting && playerStats.batting.length > 0) {
                 const aggregatedBatting = aggregateBattingStats(playerStats.batting);
-                if (aggregatedBatting) {
+                if (aggregatedBatting && aggregatedBatting.AB > 0) {
                     const thresholds = calculateBattingThresholds(aggregatedBatting);
                     if (thresholds) {
                         diceHtml.push(`
@@ -535,13 +538,15 @@
                 }
             }
             
-            // Pitching dice grid (aggregated across all teams)
+            // Pitching dice grid (aggregated across all teams) - only one grid regardless of team count
+            // Ensure we only create one pitching grid even if there are multiple team entries
             if (playerStats.pitching && playerStats.pitching.length > 0) {
                 const pitcherHandedness = playerDetails.throws || 'R';
                 const aggregatedPitching = aggregatePitchingStats(playerStats.pitching);
-                if (aggregatedPitching) {
+                if (aggregatedPitching && aggregatedPitching.IPouts > 0) {
                     const thresholds = calculatePitchingThresholds(aggregatedPitching, pitcherHandedness);
                     if (thresholds) {
+                        // Only add one pitching grid - aggregated across all teams
                         diceHtml.push(`
                             <div class="dice-grid-wrapper">
                                 <h3>${params.y}</h3>
@@ -552,9 +557,12 @@
                 }
             }
             
+            // Set dice content (should be at most one batting grid and one pitching grid)
             if (diceHtml.length > 0) {
-                document.getElementById('dice-content').innerHTML = diceHtml.join('');
+                diceContentEl.innerHTML = diceHtml.join('');
                 document.getElementById('dice-section').style.display = 'block';
+            } else {
+                document.getElementById('dice-section').style.display = 'none';
             }
             
             showPlayerContent();
