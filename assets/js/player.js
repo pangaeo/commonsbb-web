@@ -1,6 +1,6 @@
 /**
  * Player Detail Page JavaScript
- * Handles API fetching, dice calculations, and rendering
+ * Handles API fetching and rendering
  */
 
 (function() {
@@ -72,181 +72,8 @@
         }
     }
 
-    // Convert probability to base-6 4-digit representation
-    // Matches commonsbb/src/utils/DiceSystem.ts implementation exactly
-    function probabilityToBase6(probability) {
-        if (probability <= 0) return [6, 6, 6, 6];
-        if (probability >= 1) return [1, 1, 1, 1];
-        
-        // Convert probability to base-6 value (0-1295 range)
-        const base6Value = Math.round(1295 - (1295 * probability));
-        
-        // Use roundedValue for consistency with correct implementation
-        const roundedValue = Math.round(base6Value);
-        
-        if (roundedValue <= 0) return [6, 6, 6, 6];
-        if (roundedValue >= 1295) return [1, 1, 1, 1];
-        
-        // Convert to 4-digit base-6 representation (matching base6ValueToDice)
-        const digit4 = Math.floor(roundedValue / 216) + 1; // 6^3
-        const digit3 = Math.floor((roundedValue % 216) / 36) + 1; // 6^2
-        const digit2 = Math.floor((roundedValue % 36) / 6) + 1; // 6^1
-        const digit1 = (roundedValue % 6) + 1; // 6^0
-        
-        return [digit4, digit3, digit2, digit1];
-    }
 
-    // Aggregate batting stats across all teams for a year
-    function aggregateBattingStats(battingStatsArray) {
-        if (!battingStatsArray || battingStatsArray.length === 0) {
-            return null;
-        }
-        
-        const aggregated = {
-            AB: 0,
-            H: 0,
-            '2B': 0,
-            '3B': 0,
-            HR: 0,
-            SB: 0
-        };
-        
-        battingStatsArray.forEach(stat => {
-            aggregated.AB += stat.AB || 0;
-            aggregated.H += stat.H || 0;
-            aggregated['2B'] += stat['2B'] || 0;
-            aggregated['3B'] += stat['3B'] || 0;
-            aggregated.HR += stat.HR || 0;
-            aggregated.SB += stat.SB || 0;
-        });
-        
-        return aggregated;
-    }
 
-    // Calculate batting thresholds
-    function calculateBattingThresholds(stats) {
-        const { AB, H, '2B': doubles = 0, '3B': triples = 0, HR = 0, SB = 0 } = stats;
-        
-        if (!AB || AB === 0) {
-            return null;
-        }
-        
-        const singleProb = H / AB;
-        const doubleProb = (doubles + triples + HR) / AB;
-        const tripleProb = (triples + HR) / AB;
-        const homeRunProb = HR / AB;
-        const outProb = (AB - H) / AB;
-        
-        // Stolen base probability
-        const firstBaseOpportunities = (H * 1.1) - (doubles + triples + HR);
-        const stolenBaseProb = firstBaseOpportunities > 0 ? Math.min((SB / firstBaseOpportunities) + 0.3, 1) : 0;
-        
-        return {
-            out: probabilityToBase6(outProb),
-            single: probabilityToBase6(singleProb),
-            double: probabilityToBase6(doubleProb),
-            triple: probabilityToBase6(tripleProb),
-            homeRun: probabilityToBase6(homeRunProb),
-            stolenBase: probabilityToBase6(stolenBaseProb)
-        };
-    }
-
-    // Convert numeric threshold (0-1295) to base-6 4-digit representation
-    // This matches the API's dice-system.ts implementation
-    function numericThresholdToBase6(numericThreshold) {
-        // Clamp to valid range
-        const threshold = Math.max(0, Math.min(1295, Math.round(numericThreshold)));
-        
-        if (threshold <= 0) return [6, 6, 6, 6];
-        if (threshold >= 1295) return [1, 1, 1, 1];
-        
-        // Convert numeric threshold directly to base-6 digits
-        const digit4 = Math.floor(threshold / 216) + 1;
-        const digit3 = Math.floor((threshold % 216) / 36) + 1;
-        const digit2 = Math.floor((threshold % 36) / 6) + 1;
-        const digit1 = (threshold % 6) + 1;
-        
-        return [digit4, digit3, digit2, digit1];
-    }
-
-    // Aggregate pitching stats across all teams for a year
-    // This correctly calculates ERA by summing ER and IPouts, then calculating ERA = (total ER / total IP) * 9
-    function aggregatePitchingStats(pitchingStatsArray) {
-        if (!pitchingStatsArray || pitchingStatsArray.length === 0) {
-            return null;
-        }
-        
-        const aggregated = {
-            IPouts: 0,
-            ER: 0,
-            BB: 0,
-            H: 0
-        };
-        
-        pitchingStatsArray.forEach(stat => {
-            aggregated.IPouts += stat.IPouts || 0;
-            aggregated.ER += stat.ER || 0;
-            aggregated.BB += stat.BB || 0;
-            aggregated.H += stat.H || 0;
-        });
-        
-        // Calculate ERA correctly: (total ER / total IP) * 9 (ERA is runs per 9 innings)
-        const inningsPitched = aggregated.IPouts / 3;
-        aggregated.ERA = inningsPitched > 0 ? (aggregated.ER / inningsPitched) * 9 : 0;
-        
-        return aggregated;
-    }
-
-    // Calculate pitching thresholds
-    function calculatePitchingThresholds(stats, pitcherHandedness) {
-        const { IPouts, ER, BB, ERA } = stats;
-        
-        if (!IPouts || IPouts === 0) {
-            return null;
-        }
-        
-        const inningsPitched = IPouts / 3;
-        // Use ERA from stats if available, otherwise calculate it
-        // For aggregated stats, ERA should already be calculated correctly
-        const era = ERA !== undefined && ERA !== null ? ERA : (ER / inningsPitched);
-        
-        // Calculate RH advantage
-        const rhBase = pitcherHandedness === 'R' ? 4.15 : 3.85;
-        const rhAdvantage = rhBase - era;
-        const rhAction = rhAdvantage > 0 ? 'out' : 'hit';
-        const rhHeader = rhAdvantage >= 0 ? 'OUT/RH' : 'HIT/RH';
-        
-        // Convert advantage to raw value (multiply by 100) for dice calculation
-        const rhRawValue = Math.abs(rhAdvantage) * 100;
-        
-        // Calculate LH advantage
-        const lhBase = pitcherHandedness === 'L' ? 4.15 : 3.85;
-        const lhAdvantage = lhBase - era;
-        const lhAction = lhAdvantage > 0 ? 'out' : 'hit';
-        const lhHeader = lhAdvantage >= 0 ? 'OUT/LH' : 'HIT/LH';
-        
-        const lhRawValue = Math.abs(lhAdvantage) * 100;
-        
-        // Calculate BB threshold using Excel formula logic
-        // Z3 = 1000 - ROUND(V3/(U3*5), 3) * 1000
-        const z3 = 1000 - (Math.round((BB / (inningsPitched * 5)) * 1000) / 1000) * 1000;
-        
-        // Convert raw values to 4-digit base-6 dice thresholds
-        // Use probabilityToBase6 directly (same as correct implementation in commonsbb)
-        // Treat the raw values as probabilities (divide by 1000 to get 0-1 range)
-        const rhThreshold = probabilityToBase6(rhRawValue / 1000);
-        const lhThreshold = probabilityToBase6(lhRawValue / 1000);
-        const bbThreshold = probabilityToBase6(z3 / 1000);
-        
-        // Convert numeric thresholds to base-6 digits for display
-        return {
-            rhHeader: rhHeader,
-            rhThreshold: rhThreshold, // probabilityToBase6 already returns an array
-            lhHeader: lhHeader,
-            lhThreshold: lhThreshold, // probabilityToBase6 already returns an array
-            bbThreshold: bbThreshold // probabilityToBase6 already returns an array
-        };
-    }
 
     // Render dice face
     function renderDiceFace(value) {
@@ -296,13 +123,16 @@
     function renderPitchingDiceGrid(thresholds) {
         if (!thresholds) return '';
         
+        const rhHeader = thresholds.rhAction === 'out' ? 'OUT/RH' : 'HIT/RH';
+        const lhHeader = thresholds.lhAction === 'out' ? 'OUT/LH' : 'HIT/LH';
+        
         return `
             <div class="dice-grid">
                 <div class="dice-grid-title">Pitching</div>
                 <div class="dice-grid-content">
-                    ${renderDiceColumn(thresholds.rhThreshold, thresholds.rhHeader)}
-                    ${renderDiceColumn(thresholds.lhThreshold, thresholds.lhHeader)}
-                    ${renderDiceColumn(thresholds.bbThreshold, 'BB')}
+                    ${renderDiceColumn(thresholds.rh, rhHeader)}
+                    ${renderDiceColumn(thresholds.lh, lhHeader)}
+                    ${renderDiceColumn(thresholds.walk, 'BB')}
                 </div>
             </div>
         `;
@@ -528,45 +358,30 @@
                 document.getElementById('pitching-section').style.display = 'block';
             }
             
-            // Calculate and render dice probabilities (aggregated across all teams)
+            // Render dice probabilities from API thresholds
             // Clear any existing dice content first
             const diceContentEl = document.getElementById('dice-content');
             diceContentEl.innerHTML = '';
             const diceHtml = [];
             
-            // Batting dice grid (aggregated across all teams) - only one grid regardless of team count
-            if (playerStats.batting && playerStats.batting.length > 0) {
-                const aggregatedBatting = aggregateBattingStats(playerStats.batting);
-                if (aggregatedBatting && aggregatedBatting.AB > 0) {
-                    const thresholds = calculateBattingThresholds(aggregatedBatting);
-                    if (thresholds) {
-                        diceHtml.push(`
-                            <div class="dice-grid-wrapper">
-                                <h3>${params.y}</h3>
-                                ${renderBattingDiceGrid(thresholds)}
-                            </div>
-                        `);
-                    }
-                }
+            // Batting dice grid - use thresholds from API
+            if (playerStats.thresholds && playerStats.thresholds.batting) {
+                diceHtml.push(`
+                    <div class="dice-grid-wrapper">
+                        <h3>${params.y}</h3>
+                        ${renderBattingDiceGrid(playerStats.thresholds.batting)}
+                    </div>
+                `);
             }
             
-            // Pitching dice grid (aggregated across all teams) - only one grid regardless of team count
-            // Ensure we only create one pitching grid even if there are multiple team entries
-            if (playerStats.pitching && playerStats.pitching.length > 0) {
-                const pitcherHandedness = playerDetails.throws || 'R';
-                const aggregatedPitching = aggregatePitchingStats(playerStats.pitching);
-                if (aggregatedPitching && aggregatedPitching.IPouts > 0) {
-                    const thresholds = calculatePitchingThresholds(aggregatedPitching, pitcherHandedness);
-                    if (thresholds) {
-                        // Only add one pitching grid - aggregated across all teams
-                        diceHtml.push(`
-                            <div class="dice-grid-wrapper">
-                                <h3>${params.y}</h3>
-                                ${renderPitchingDiceGrid(thresholds)}
-                            </div>
-                        `);
-                    }
-                }
+            // Pitching dice grid - use thresholds from API
+            if (playerStats.thresholds && playerStats.thresholds.pitching) {
+                diceHtml.push(`
+                    <div class="dice-grid-wrapper">
+                        <h3>${params.y}</h3>
+                        ${renderPitchingDiceGrid(playerStats.thresholds.pitching)}
+                    </div>
+                `);
             }
             
             // Set dice content (should be at most one batting grid and one pitching grid)
