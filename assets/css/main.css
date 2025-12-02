@@ -2842,3 +2842,13 @@ body.is-menu-visible #menu {
   transform: translateX(0);
   box-shadow: 0 0 1.5rem 0 rgba(0, 0, 0, 0.2);
   visibility: visible; }
+
+@media screen and (max-width: 736px) {
+	.image.left, .image.right {
+		float: none;
+		display: block;
+		margin: 0 0 2rem 0;
+		max-width: 100%;
+		width: 100%;
+	}
+}
